@@ -1,0 +1,25 @@
+--release
+--output
+C:\Users\User\Desktop\android\QR - Copy\Objects
+--lib
+C:\android\platforms\android-30\android.jar
+C:\android\tools\..\extras\b4a_local\unpacked-b4ashared-63837448956000\dex_v1\b4ashared.zip
+C:\android\tools\..\extras\b4a_local\unpacked-core-63837448958000\dex_v1\core.zip
+C:\android\tools\..\extras\b4a_local\unpacked-qrcodereaderview-63583763928000\dex_v1\qrcodereaderview.zip
+C:\android\tools\..\extras\b4a_local\unpacked-jhscore-63583747524000\dex_v1\jhscore.zip
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\main$1.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\main$B4AMenuItemsClickListener.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\main$HandleKeyDelayed.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\main$ResumableSub_b1_Click.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\main$ResumableSub_b2_Click.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\main$ResumeMessage.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\main$WaitForLayout.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\main.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\R$drawable.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\R$style.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\R.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\starter$1.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\starter$2.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\starter$starter_BR.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\starter.dex
+C:\Users\User\Desktop\android\QR - Copy\Objects\dexed\b4a\QRReader14\designerscripts\LS_main.dex

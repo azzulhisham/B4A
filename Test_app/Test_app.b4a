@@ -1,0 +1,120 @@
+﻿Build1=Default,b4a.example
+File1=Layout.bal
+FileGroup1=Default Group
+Group=Default Group
+Library1=core
+Library2=nfc
+Library3=okhttp
+Library4=okhttputils2
+Library5=xui
+Library6=json
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="29"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~SetApplicationAttribute(android:usesCleartextTraffic, "true")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~'End of default text.~\n~
+Module1=Starter
+NumberOfFiles=1
+NumberOfLibraries=6
+NumberOfModules=1
+Version=11.2
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: Test App
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: True
+#End Region
+
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+	Private xui As XUI
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	
+	Private btn_HttpCall As Button
+	Private lbl_HttpResult As Label
+	
+	Private btn_dt As Button
+	Private lbl_dt As Label
+	
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	Activity.LoadLayout("Layout")
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+
+Private Sub btn_HttpCall_Click
+	
+	Dim Job As HttpJob
+	Dim data As Map
+	Dim json As JSONGenerator
+
+	Job.Initialize("",Me)
+		
+	data.Initialize
+	data.Put("ts", "2023-12-18 23:10")
+	data.Put("msgtype", "3")
+	data.Put("mmsi", "0")
+	data.Put("sog", "18")
+	data.Put("cog", "0")
+	data.Put("rot", "0")
+	data.Put("heading", "0")
+	data.Put("lat", "3.10678")
+	data.Put("lng", "103.103")
+	json.Initialize(data)
+
+	Dim body As String = $"{'ts':'2023-12-21 00:33', 'msgtype':'3', 'mmsi':'0', 'sog':'0', 'cog':'0', 'rot':'0', 'heading':'0', 'lat':'3.123', 'lng':'103.123'}"$
+	
+	Private str As String = "http://a4d7a9a660b454018a3f48b10da546c4-688407555.ap-southeast-1.elb.amazonaws.com:3838/insert"
+	
+	Try	
+		Job.PostString(str, json.ToString)
+		
+		Job.GetRequest.SetHeader("accept","application/json")
+		Job.GetRequest.SetContentType("application/json")
+
+		Wait For (Job) JobDone(Job As HttpJob)
+
+		If Job.Success Then
+			lbl_HttpResult.Text = "Success! - "
+			Dim result As String = Job.GetString
+	
+			lbl_HttpResult.Text = result
+
+		Else
+			lbl_HttpResult.Text = "Fail! - " & Job.ErrorMessage
+		End If
+	Catch
+		lbl_HttpResult.Text = "[error]::" & LastException.Message
+	End Try
+
+
+	Job.Release
+	
+End Sub
+
+Private Sub btn_dt_Click
+	
+	DateTime.DateFormat = "yyyy-MM-dd"
+	DateTime.TimeFormat = "HH:mm:ss"
+	
+	Dim now As Long = DateTime.Now
+	lbl_dt.Text = DateTime.Date(now) & " " & DateTime.Time(now)
+	
+End Sub

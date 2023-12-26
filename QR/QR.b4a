@@ -1,0 +1,77 @@
+﻿Build1=Default,b4a.QRReader
+File1=main.bal
+FileGroup1=Default Group
+Group=Default Group
+Library1=core
+Library2=qrcodereaderview
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="8" android:targetSdkVersion="17"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~AddManifestText(<uses-feature android:name="android.hardware.telephony" android:required="false" />)~\n~AddManifestText(<uses-feature android:name="android.hardware.camera" android:required="false" />)~\n~AddManifestText(<uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />)~\n~AddManifestText(<uses-feature android:name="android.hardware.camera.flash" android:required="false" />)~\n~'AddPermission("android.permission.ACCESS_COARSE_LOCATION")~\n~AddPermission("android.permission.INTERNET")~\n~AddPermission("android.permission.ACCESS_FINE_LOCATION")~\n~AddPermission("android.permission.WAKE_LOCK")~\n~AddPermission("android.permission.DEVICE_POWER")~\n~'AddPermission("android.permission.ACCESS_COARSE_UPDATES")~\n~AddPermission("android.permission.READ_PHONE_STATE")~\n~AddPermission("android.permission.VIBRATE")~\n~AddPermission("android.permission.CAMERA")~\n~AddPermission("android.permission.FLASHLIGHT")~\n~AddPermission("android.hardware.camera")	~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~'End of default text.~\n~
+Module1=Starter
+NumberOfFiles=1
+NumberOfLibraries=2
+NumberOfModules=1
+Version=12.8
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: QRReader
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: portrait
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: True
+#End Region
+
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	Private qrcrv As QRCodeReaderView
+	Private b1 As Button
+	Private b2 As Button
+
+	Private l1 As Label
+	
+	Private p1 As Panel
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	'Do not forget to load the layout file created with the visual designer. For example:
+	Activity.LoadLayout("main")
+	
+	qrcrv.Visible = False
+	
+
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+Sub b1_Click
+	qrcrv.Visible = True
+	DoEvents
+	qrcrv.startScan
+End Sub
+
+Sub b2_Click
+	qrcrv.stopScan
+	DoEvents
+	qrcrv.Visible = False
+End Sub
+
+Sub qrcrv_result_found(retval As String)
+	Log("B4A: " & retval)
+	l1.Text = retval
+End Sub

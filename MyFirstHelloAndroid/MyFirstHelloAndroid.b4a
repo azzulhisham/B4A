@@ -1,0 +1,169 @@
+﻿Build1=Default,b4a.MyFirstHelloAndroid
+File1=Layout.bal
+File2=LayoutMain.bal
+FileGroup1=Default Group
+FileGroup2=Default Group
+Group=Default Group
+Library1=core
+Library2=okhttp
+Library3=okhttputils2
+Library4=xui
+Library5=json
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: https://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="14" android:targetSdkVersion="29"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~CreateResourceFromFile(Macro, Themes.LightTheme)~\n~'End of default text.~\n~
+Module1=Starter
+NumberOfFiles=2
+NumberOfLibraries=5
+NumberOfModules=1
+Version=11.2
+@EndOfDesignText@
+#Region  Project Attributes 
+	#ApplicationLabel: B4A MyFirstHelloAndroid
+	#VersionCode: 1
+	#VersionName: 
+	'SupportedOrientations possible values: unspecified, landscape or portrait.
+	#SupportedOrientations: unspecified
+	#CanInstallToExternalStorage: False
+#End Region
+
+#Region  Activity Attributes 
+	#FullScreen: False
+	#IncludeTitle: True
+#End Region
+
+Sub Process_Globals
+	'These global variables will be declared once when the application starts.
+	'These variables can be accessed from all modules.
+	Private xui As XUI
+	
+End Sub
+
+Sub Globals
+	'These global variables will be redeclared each time the activity is created.
+	Public num1 As Int
+	Public num2 As Int
+	Public selectedlangs() As String = Array As String("en", "zh-hans", "ko", "ja")
+	
+	Private EditText1 As EditText
+	Private lblNumber1 As Label
+	Private lblNumber2 As Label
+	Private Button1 As Button
+	Private lbl_HttpResult As Label
+	
+	Private btn_HttpCall As Button
+	
+	Private Spinner1 As Spinner
+	Private EditText2 As EditText
+	
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	Activity.LoadLayout("LayoutMain")
+	Spinner1.AddAll(Array As String("English", "中文 (简体)", "한국어", "日本語"))
+	
+	NewEquation
+End Sub
+
+Sub Activity_Resume
+
+End Sub
+
+Sub Activity_Pause (UserClosed As Boolean)
+
+End Sub
+
+Sub NewEquation
+	
+	num1 = Rnd(1, 10)
+	num2 = Rnd(1, 10)
+	
+	lblNumber1.Text = num1
+	lblNumber2.Text = num2
+	
+	EditText1.Text = ""
+	Button1.Text = "Check Result"
+	
+End Sub
+
+Sub CheckResult
+	
+	If EditText1.Text = num1 + num2 Then
+		xui.MsgboxAsync("Well Done!", "Simple Math")
+		Button1.Text = "Try Another!"
+	Else
+		xui.MsgboxAsync("Ops! Please try again.", "Simple Math")
+	End If
+	
+End Sub
+
+Private Sub Button1_Click
+	
+	If Button1.Text = "Check Result" Then
+		If EditText1.Text = "" Then
+			xui.MsgboxAsync("Please enter your result!", "Simple Math")
+		Else
+			CheckResult		
+		End If
+	Else
+		NewEquation
+	End If
+	
+End Sub
+
+Private Sub btn_HttpCall_Click
+	
+	Dim Job As HttpJob
+
+	Job.Initialize("",Me)
+	
+	'Private str As String = "https://api.cognitive.microsofttranslator.com/languages?api-version=3.0"
+	'Job.download(str)
+	
+	Private str As String = $"https://api.cognitive.microsofttranslator.com/translate?api-version=3.0&from=en&to=${selectedlangs(Spinner1.SelectedIndex)}"$
+	Dim word As String = $"[{'text':'${EditText2.Text.Trim}'}]"$
+	
+	Job.PostString(str, word)
+	
+	Job.GetRequest.SetHeader("Ocp-Apim-Subscription-Key","5f6d8efdd5b54de69a35b76a8e320332")
+	Job.GetRequest.SetHeader("Ocp-Apim-Subscription-Region","southeastasia")
+	Job.GetRequest.SetHeader("accept","application/json")
+	Job.GetRequest.SetContentType("application/json")
+
+	Wait For (Job) JobDone(Job As HttpJob)
+
+	If Job.Success Then
+		lbl_HttpResult.Text = "Success! - "
+		Dim result As String = Job.GetString
+		
+		Dim parser As JSONParser
+		parser.Initialize(result)
+		Dim root As List = parser.NextArray
+		Dim map1 As Map = root.Get(0)
+		 
+		Dim msg As List = map1.Get("translations")
+		Dim res As String
+		
+		For Each data As Map In msg
+			res = data.Get("text") 
+		Next
+			
+		lbl_HttpResult.Text = res
+
+	Else
+		lbl_HttpResult.Text = "Fail! - "  + Job.ErrorMessage
+	End If
+
+	Job.Release
+	
+End Sub
+
+
+
+Private Sub Spinner1_ItemClick (Position As Int, Value As Object)
+	'lbl_HttpResult.Text = selectedlangs(Spinner1.SelectedIndex)
+End Sub
+
+Private Sub EditText2_FocusChanged (HasFocus As Boolean)
+	If HasFocus Then
+		EditText2.SelectAll
+	End If
+End Sub

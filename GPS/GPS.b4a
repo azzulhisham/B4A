@@ -1,0 +1,134 @@
+﻿Build1=Default,anywheresoftware.b4a.samples.gps
+File1=1.bal
+FileGroup1=Default Group
+Group=Default Group
+Library1=core
+Library2=gps
+Library3=json
+Library4=okhttp
+Library5=runtimepermissions
+Library6=okhttputils2
+ManifestCode='This code will be applied to the manifest file during compilation.~\n~'You do not need to modify it in most cases.~\n~'See this link for for more information: http://www.b4x.com/forum/showthread.php?p=78136~\n~AddManifestText(~\n~<uses-sdk android:minSdkVersion="4" android:targetSdkVersion="26"/>~\n~<supports-screens android:largeScreens="true" ~\n~    android:normalScreens="true" ~\n~    android:smallScreens="true" ~\n~    android:anyDensity="true"/>)~\n~SetApplicationAttribute(android:icon, "@drawable/icon")~\n~SetApplicationAttribute(android:label, "$LABEL$")~\n~SetApplicationAttribute(android:usesCleartextTraffic, "true")~\n~'End of default text.~\n~AddManifestText(<uses-feature android:name="android.hardware.location.gps"/>)
+Module1=Starter
+NumberOfFiles=1
+NumberOfLibraries=6
+NumberOfModules=1
+Version=11.2
+@EndOfDesignText@
+#Region Module Attributes
+	#FullScreen: False
+	#IncludeTitle: True
+	#ApplicationLabel: GPS
+	#VersionCode: 1
+	#VersionName: 
+	#SupportedOrientations: unspecified
+#End Region
+#BridgeLogger: true
+Sub Process_Globals
+	
+End Sub
+
+Sub Globals
+	Dim lblLon As Label
+	Dim lblLat As Label
+	Dim lblSpeed As Label
+	dim lblBearing as Label
+	Dim lblSatellites As Label
+	Dim lbl_HttpResult As Label
+End Sub
+
+Sub Activity_Create(FirstTime As Boolean)
+	Activity.LoadLayout("1")
+End Sub
+
+Sub Activity_Resume
+	If Starter.GPS1.GPSEnabled = False Then
+		ToastMessageShow("Please enable the GPS device.", True)
+		StartActivity(Starter.GPS1.LocationSettingsIntent) 'Will open the relevant settings screen.
+	Else
+		Starter.rp.CheckAndRequest(Starter.rp.PERMISSION_ACCESS_FINE_LOCATION)
+		Wait For Activity_PermissionResult (Permission As String, Result As Boolean)
+		If Result Then CallSubDelayed(Starter, "StartGPS")
+	End If
+End Sub
+	
+
+Sub Activity_Pause (UserClosed As Boolean)
+	CallSubDelayed(Starter, "StopGPS")
+End Sub
+
+Public Sub GpsStatus (Satellites As List)
+	Dim sb As StringBuilder
+	sb.Initialize
+	sb.Append("Satellites:").Append(CRLF)
+	For i = 0 To Satellites.Size - 1
+		Dim Satellite As GPSSatellite = Satellites.Get(i)
+		sb.Append(CRLF).Append(Satellite.Prn).Append($" $1.2{Satellite.Snr}"$).Append(" ").Append(Satellite.UsedInFix)
+		sb.Append(" ").Append($" $1.2{Satellite.Azimuth}"$).Append($" $1.2{Satellite.Elevation}"$)
+	Next
+	lblSatellites.Text = sb.ToString
+End Sub
+
+Public Sub LocationChanged(Location1 As Location)
+	lblLat.Text = "Lat = " & Location1.Latitude
+	lblLon.Text = "Lon = " & Location1.Longitude
+	lblSpeed.Text = $"Speed = $1.2{Location1.Speed} m/s "$
+	lblBearing.Text = "Bearing = " & Location1.Bearing & " --- Altitude = " & Location1.Altitude
+	
+	DateTime.DateFormat = "yyyy-MM-dd"
+	DateTime.TimeFormat = "HH:mm:ss"
+	
+	Dim now As Long = DateTime.Now
+	Dim dateStr As String = DateTime.Date(now) & " " & DateTime.Time(now)
+	
+	Dim Job As HttpJob
+	Dim data As Map
+	Dim json As JSONGenerator
+
+	Job.Initialize("",Me)
+		
+	data.Initialize
+	data.Put("ts", dateStr)
+	data.Put("msgtype", "3")
+	data.Put("mmsi", "2820574")
+	data.Put("sog", "'" & Location1.Speed & "'")
+	data.Put("cog", "'" & Location1.Bearing & "'")
+	data.Put("rot", "0")
+	data.Put("heading", "0")
+	data.Put("lat", "'" & Location1.Latitude & "'")
+	data.Put("lng",  "'" & Location1.Longitude & "'")
+	json.Initialize(data)
+
+	
+	Private str As String = "http://a4d7a9a660b454018a3f48b10da546c4-688407555.ap-southeast-1.elb.amazonaws.com:3838/insert"
+	
+	Try
+		Job.PostString(str, json.ToString)
+		
+		Job.GetRequest.SetHeader("accept","application/json")
+		Job.GetRequest.SetContentType("application/json")
+
+		Wait For (Job) JobDone(Job As HttpJob)
+
+		If Job.Success Then
+			lbl_HttpResult.Text = "Success! - "
+			Dim result As String = Job.GetString
+	
+			lbl_HttpResult.Text = result
+
+		Else
+			lbl_HttpResult.Text = "Fail! - " & Job.ErrorMessage
+		End If
+	Catch
+		lbl_HttpResult.Text = "[error]::" & LastException.Message
+	End Try
+
+
+	Job.Release
+	
+	
+	
+End Sub
+
+
+
